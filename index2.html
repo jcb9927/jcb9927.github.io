@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Índice de contenidos privados</title>
+  <script>
+    // Configura aquí tu "contraseña" deseada
+    const CLAVE_CORRECTA = 'miclave123';
+    const URL_REDIRECCION = 'index.html';
+
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      const clave = params.get('clave');
+
+      if (clave !== CLAVE_CORRECTA) {
+        // Si la clave es incorrecta o falta, redirige sin avisos
+        window.location.href = URL_REDIRECCION;
+      } else {
+        // Si es correcta, muestra el contenido
+        document.getElementById('contenido').style.display = 'block';
+      }
+    }
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 2em; }
+    #contenido { display: none; }
+  </style>
+</head>
+<body>
+  <div id="contenido">
+    <h1>Índice de contenidos privados</h1>
+    <ul>
+      <li><a href="documento1.html">Documento 1</a></li>
+      <li><a href="documento2.html">Documento 2</a></li>
+      <li><a href="enlace_externo.html">Otro recurso</a></li>
+    </ul>
+  </div>
+</body>
+</html>
