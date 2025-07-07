@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Página en pruebas</title>
+  <title>Proyecto en Desarrollo</title>
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <style>
     body {
@@ -11,7 +11,7 @@
       color: #333;
       margin: 2em;
     }
-    #contenido {
+    #cuerpo {
       max-width: 800px;
       margin: auto;
       background-color: #fff;
@@ -20,44 +20,52 @@
       border-radius: 5px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
+    h1 {
+      font-size: 1.2em;
+      color: #555;
+    }
   </style>
 </head>
 <body>
-  <div id="contenido" style="display:none;"></div>
+  <div id="cuerpo">
+    <h1>Página en desarrollo</h1>
+    <p>⚠️ Este apartado está en revisión. Contenido provisional.</p>
+    <ul>
+      <li><a href="#">Enlace de prueba A</a></li>
+      <li><a href="#">Enlace de prueba B</a></li>
+      <li><a href="#">Otros recursos (pendientes)</a></li>
+    </ul>
+    <p style="font-size:0.9em; color:#888;">* notas internas para reorganizar en el futuro *</p>
+  </div>
 
   <script>
     (function() {
-      // Configuración: URL a la que redirigir si no hay acceso válido
-      const URL_REDIRECCION = 'index.html';
+      const FIRMA = '||HashValidacion';
 
-      // Obtener parámetros de la URL
       const params = new URLSearchParams(window.location.search);
       const clave = params.get('clave');
       const datos = params.get('datos');
 
-      // Verificar que se envió todo
       if (!clave || !datos) {
-        window.location.href = URL_REDIRECCION;
+
         return;
       }
 
       try {
-        // Intentar descifrar
         const decrypted = CryptoJS.AES.decrypt(datos, clave);
         const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
 
-        // Si la clave es incorrecta, plaintext será vacío
-        if (!plaintext) {
-          throw new Error('Descifrado vacío');
+        if (!plaintext || !plaintext.endsWith(FIRMA)) {
+
+          return;
         }
 
-        // Insertar contenido descifrado en el DIV
-        const div = document.getElementById('contenido');
-        div.innerHTML = plaintext;
-        div.style.display = 'block';
+
+        const contenidoReal = plaintext.slice(0, -FIRMA.length);
+        document.getElementById('cuerpo').innerHTML = contenidoReal;
       } catch (e) {
-        // Si algo falla, redirigir sin explicaciones
-        window.location.href = URL_REDIRECCION;
+
+        return;
       }
     })();
   </script>
