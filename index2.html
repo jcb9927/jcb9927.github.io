@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Índice de contenidos privados</title>
+  <title>Borrador - Página en pruebas</title>
   <script>
-    // Configura aquí tu "contraseña" deseada
+    // Contraseña para acceso
     const CLAVE_CORRECTA = 'miclave123';
     const URL_REDIRECCION = 'index.html';
 
@@ -13,27 +13,50 @@
       const clave = params.get('clave');
 
       if (clave !== CLAVE_CORRECTA) {
-        // Si la clave es incorrecta o falta, redirige sin avisos
         window.location.href = URL_REDIRECCION;
       } else {
-        // Si es correcta, muestra el contenido
         document.getElementById('contenido').style.display = 'block';
       }
     }
   </script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 2em; }
-    #contenido { display: none; }
+    body {
+      font-family: monospace;
+      background-color: #f0f0f0;
+      color: #333;
+      margin: 2em;
+    }
+    #contenido {
+      display: none;
+      background-color: #fff;
+      border: 1px dashed #ccc;
+      padding: 1em;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 1.2em;
+      color: #555;
+    }
+    ul {
+      padding-left: 1.2em;
+    }
+    li {
+      margin-bottom: 0.5em;
+    }
   </style>
 </head>
 <body>
   <div id="contenido">
-    <h1>Índice de contenidos privados</h1>
+    <h1>Borrador de enlaces – Página en pruebas</h1>
+    <p>⚠️ Esta sección está en revisión. Contenido provisional.</p>
     <ul>
-      <li><a href="documento1.html">Documento 1</a></li>
-      <li><a href="documento2.html">Documento 2</a></li>
-      <li><a href="enlace_externo.html">Otro recurso</a></li>
+      <li><a href="doc01.html">enlace de prueba 1</a></li>
+      <li><a href="doc02.html">enlace de prueba 2</a></li>
+      <li><a href="otros.html">otros recursos (pendientes)</a></li>
+      <li><a href="#">[link roto]</a></li>
     </ul>
+    <p style="font-size:0.9em; color:#888;">* notas internas para reorganizar en el futuro *</p>
   </div>
 </body>
 </html>
