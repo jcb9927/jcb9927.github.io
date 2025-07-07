@@ -2,61 +2,64 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Borrador - Página en pruebas</title>
-  <script>
-    // Contraseña para acceso
-    const CLAVE_CORRECTA = 'miclave123';
-    const URL_REDIRECCION = 'index.html';
-
-    window.onload = function() {
-      const params = new URLSearchParams(window.location.search);
-      const clave = params.get('clave');
-
-      if (clave !== CLAVE_CORRECTA) {
-        window.location.href = URL_REDIRECCION;
-      } else {
-        document.getElementById('contenido').style.display = 'block';
-      }
-    }
-  </script>
+  <title>Página en pruebas</title>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <style>
     body {
-      font-family: monospace;
+      font-family: Arial, sans-serif;
       background-color: #f0f0f0;
       color: #333;
       margin: 2em;
     }
     #contenido {
-      display: none;
-      background-color: #fff;
-      border: 1px dashed #ccc;
-      padding: 1em;
       max-width: 800px;
       margin: auto;
-    }
-    h1 {
-      font-size: 1.2em;
-      color: #555;
-    }
-    ul {
-      padding-left: 1.2em;
-    }
-    li {
-      margin-bottom: 0.5em;
+      background-color: #fff;
+      padding: 1em;
+      border: 1px dashed #ccc;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
-  <div id="contenido">
-    <h1>Borrador de enlaces – Página en pruebas</h1>
-    <p>⚠️ Esta sección está en revisión. Contenido provisional.</p>
-    <ul>
-      <li><a href="doc01.html">enlace de prueba 1</a></li>
-      <li><a href="doc02.html">enlace de prueba 2</a></li>
-      <li><a href="otros.html">otros recursos (pendientes)</a></li>
-      <li><a href="#">[link roto]</a></li>
-    </ul>
-    <p style="font-size:0.9em; color:#888;">* notas internas para reorganizar en el futuro *</p>
-  </div>
+  <div id="contenido" style="display:none;"></div>
+
+  <script>
+    (function() {
+      // Configuración: URL a la que redirigir si no hay acceso válido
+      const URL_REDIRECCION = 'index.html';
+
+      // Obtener parámetros de la URL
+      const params = new URLSearchParams(window.location.search);
+      const clave = params.get('clave');
+      const datos = params.get('datos');
+
+      // Verificar que se envió todo
+      if (!clave || !datos) {
+        window.location.href = URL_REDIRECCION;
+        return;
+      }
+
+      try {
+        // Intentar descifrar
+        const decrypted = CryptoJS.AES.decrypt(datos, clave);
+        const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+
+        // Si la clave es incorrecta, plaintext será vacío
+        if (!plaintext) {
+          throw new Error('Descifrado vacío');
+        }
+
+        // Insertar contenido descifrado en el DIV
+        const div = document.getElementById('contenido');
+        div.innerHTML = plaintext;
+        div.style.display = 'block';
+      } catch (e) {
+        // Si algo falla, redirigir sin explicaciones
+        window.location.href = URL_REDIRECCION;
+      }
+    })();
+  </script>
 </body>
 </html>
