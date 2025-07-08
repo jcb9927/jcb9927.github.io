@@ -50,12 +50,18 @@
             const textoCifrado = await respBlob.text();
 
             const bytes = CryptoJS.AES.decrypt(textoCifrado, clave);
-            const textoPlano = bytes.toString(CryptoJS.enc.Latin1);
+            const textoPlano = bytes.toString(CryptoJS.enc.Utf8);
 
-            if (!textoPlano.startsWith(FIRMA)) throw new Error('Firma inválida');
+            if (!textoPlano || !textoPlano.startsWith(FIRMA)) throw new Error('Firma inválida o clave incorrecta');
 
-            const binarioReal = textoPlano.slice(FIRMA.length);
-            const byteArray = new Uint8Array([...binarioReal].map(c => c.charCodeAt(0)));
+            const base64 = textoPlano.slice(FIRMA.length);
+
+            // Decodificar Base64 a bytes reales
+            const binString = atob(base64);
+            const byteArray = new Uint8Array(binString.length);
+            for (let i = 0; i < binString.length; i++) {
+              byteArray[i] = binString.charCodeAt(i);
+            }
             const blobDescifrado = new Blob([byteArray]);
 
             const imgURL = URL.createObjectURL(blobDescifrado);
