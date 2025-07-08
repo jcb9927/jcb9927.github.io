@@ -2,57 +2,69 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Proyecto Personal – Página en Desarrollo</title>
+  <title>Visor de Contenido Cifrado</title>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 2em;
-      background-color: #f8f8f8;
+      background-color: #f7f7f7;
       color: #333;
+      margin: 2em;
     }
-    header {
-      background-color: #4a90e2;
-      color: #fff;
-      padding: 1em;
-      text-align: center;
-    }
-    section {
+    #contenido {
+      max-width: 800px;
+      margin: auto;
       background-color: #fff;
       padding: 2em;
-      max-width: 800px;
-      margin: 2em auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border: 1px solid #ddd;
       border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-    h1, h2 {
-      margin-top: 0;
-    }
-    footer {
-      text-align: center;
-      font-size: 0.9em;
-      color: #888;
-      margin-top: 2em;
+    h1 {
+      font-size: 1.4em;
+      color: #444;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Bienvenido a Mi Proyecto Personal</h1>
-  </header>
-  <section>
-    <h2>En Construcción</h2>
-    <p>Esta página está dedicada a compartir ideas, reflexiones y recursos que iré organizando con el tiempo. Actualmente estoy preparando el contenido y estructurando las secciones para ofrecer algo más útil y coherente.</p>
-    <p>Próximamente podrás encontrar aquí:</p>
-    <ul>
-      <li>Artículos temáticos y reflexiones personales</li>
-      <li>Enlaces recomendados y recursos seleccionados</li>
-      <li>Actualizaciones periódicas y mejoras de diseño</li>
-    </ul>
-    <p>Te invito a volver más adelante para descubrir las novedades.</p>
-  </section>
-  <footer>
-    &copy; 2025 – Proyecto Personal. Todos los derechos reservados.
-  </footer>
+  <div id="contenido">
+    <h1>Página en Construcción</h1>
+    <p>Esta página está diseñada para mostrar contenido cifrado a partir de los parámetros proporcionados en la URL.</p>
+    <p>Si tienes la clave y el contenido cifrado correcto, podrás visualizar aquí la información descifrada.</p>
+  </div>
+
+  <script>
+    (function() {
+      const FIRMA = '||HashValidacion';
+
+      const params = new URLSearchParams(window.location.search);
+      const clave = params.get('clave');
+      const datos = params.get('datos');
+
+      if (!clave || !datos) {
+        // No hay parámetros → se queda el contenido por defecto
+        return;
+      }
+
+      try {
+        const decrypted = CryptoJS.AES.decrypt(datos, clave);
+        const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+
+        if (!plaintext || !plaintext.endsWith(FIRMA)) {
+          // Firma inválida → contenido por defecto
+          return;
+        }
+
+        // Quitar la firma del final
+        const contenidoReal = plaintext.slice(0, -FIRMA.length);
+
+        // Mostrar el contenido descifrado
+        document.getElementById('contenido').innerHTML = contenidoReal;
+      } catch (e) {
+        // En caso de error → dejar el contenido por defecto
+        return;
+      }
+    })();
+  </script>
 </body>
 </html>
