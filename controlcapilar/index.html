@@ -1,11 +1,86 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Control Capilar – Galería Cifrada</title>
+  <meta charset="UTF-8" />
+  <title>Galería Control Capilar</title>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 1em; }
+    h1 { text-align: center; }
+    #galeria { display: flex; flex-wrap: wrap; justify-content: center; gap: 1em; margin-top: 1em; }
+    .foto { background: #fff; border-radius: 6px; box-shadow: 0 0 5px rgba(0,0,0,0.1); padding: 0.5em; text-align: center; width: 220px; }
+    .foto img { max-width: 200px; max-height: 200px; display: block; margin: auto; }
+    .titulo { margin-top: 0.3em; font-size: 0.9em; color: #555; }
+    #mensaje { text-align: center; margin-top: 1em; color: #a33; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <h1>Galería de Control Capilar</h1>
-  <p>Esta página servirá para mostrar imágenes cifradas. Próximamente más contenido.</p>
+  <h1>Galería Control Capilar</h1>
+  <div id="mensaje">Cargando imágenes descifradas...</div>
+  <div id="galeria"></div>
+
+  <script>
+    const FIRMA = '||HashValidacion';
+    const LISTADO_URL = 'blobs/listado.json';
+    const BLOBS_BASE = 'blobs/';
+    const clave = new URLSearchParams(window.location.search).get('clave');
+
+    if (!clave) {
+      document.getElementById('mensaje').textContent = "⚠️ No se ha proporcionado clave en la URL.";
+    } else {
+      cargarGaleria();
+    }
+
+    async function cargarGaleria() {
+      try {
+        const res = await fetch(LISTADO_URL);
+        if (!res.ok) throw new Error('No se pudo cargar listado.json');
+        const lista = await res.json();
+
+        const contenedor = document.getElementById('galeria');
+        document.getElementById('mensaje').textContent = '';
+
+        let exitos = 0;
+
+        for (const item of lista) {
+          try {
+            const urlBlob = BLOBS_BASE + item.archivo;
+            const respBlob = await fetch(urlBlob);
+            if (!respBlob.ok) throw new Error(`No se pudo descargar ${item.archivo}`);
+            const textoCifrado = await respBlob.text();
+
+            const bytes = CryptoJS.AES.decrypt(textoCifrado, clave);
+            const textoPlano = bytes.toString(CryptoJS.enc.Latin1);
+
+            if (!textoPlano.startsWith(FIRMA)) throw new Error('Firma inválida');
+
+            const binarioReal = textoPlano.slice(FIRMA.length);
+            const byteArray = new Uint8Array([...binarioReal].map(c => c.charCodeAt(0)));
+            const blobDescifrado = new Blob([byteArray]);
+
+            const imgURL = URL.createObjectURL(blobDescifrado);
+            const div = document.createElement('div');
+            div.className = 'foto';
+            div.innerHTML = `
+              <img src="${imgURL}" alt="${item.titulo}">
+              <div class="titulo">${item.titulo}</div>
+            `;
+            contenedor.appendChild(div);
+            exitos++;
+          } catch (err) {
+            console.log(`Error con ${item.archivo}: ${err.message}`);
+          }
+        }
+
+        if (exitos === 0) {
+          document.getElementById('mensaje').textContent = "⚠️ Ninguna imagen pudo descifrarse. Verifica la clave.";
+        }
+
+      } catch (error) {
+        document.getElementById('mensaje').textContent = "⚠️ Error al cargar la galería.";
+        console.error(error);
+      }
+    }
+  </script>
 </body>
 </html>
